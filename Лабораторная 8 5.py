@@ -22,7 +22,7 @@ for i in range(n):
         if j > i:
             if mx < a[i][j]:
                 mx = a[i][j]
-        if j > abs(i - 3):
+        if j > abs(i - (n - 1)):
             if mn > a[i][j]:
                 mn = a[i][j]
 
