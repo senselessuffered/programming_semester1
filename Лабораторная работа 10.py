@@ -153,25 +153,27 @@ def main():
         else:
             n = n2
     else:
-        if abs_err_i3 < abs_err_i4:
+        if abs_err_i3 < abs_err_i4 and abs_err_i3 != math.inf:
             n = n1
-        else:
+        elif abs_err_i3 > abs_err_i4 and abs_err_i4 != math.inf:
             n = n2
-    while True:
-        if worth == 'Метод правых прямоугольников':
-            i_n = integral_method_right_rectangles(a, b, n)
-            i_2n = integral_method_right_rectangles(a, b, 2*n)
         else:
-            i_n = integral_method_three_eighths(a, b, n)
-            i_2n = integral_method_three_eighths(a, b, 2*n)
-        if (i_n != None) and (i_2n != None):
+            print('Метод 3/8 явдяется неточным, т.к он не определен')
+    if 'n' in locals():
+        while True:
+            if worth == 'Метод правых прямоугольников':
+                i_n = integral_method_right_rectangles(a, b, n)
+                i_2n = integral_method_right_rectangles(a, b, 2*n)
+            else:
+                i_n = integral_method_three_eighths(a, b, n)
+                i_2n = integral_method_three_eighths(a, b, 2*n)
             if abs(i_n - i_2n) < delta_const:
                 break
-        n *= 2
-        
-    # вывод
-    print(f'\nДля метода {worth} требуется {n} участков разбиения для достижения заданной точности')
-    print(f'Приближенное значение интеграла: {i_n:.7g}')
+            n *= 2
+            
+        # вывод
+        print(f'\nДля метода {worth} требуется {n} участков разбиения для достижения заданной точности')
+        print(f'Приближенное значение интеграла: {i_n:.7g}')
     
 if __name__ == "__main__":
     main()
