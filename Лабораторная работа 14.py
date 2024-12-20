@@ -7,6 +7,9 @@ import string
 import prettytable
 import struct
 
+# функция проверяет что в списке одиноковые типы данных
+
+
 # представляет строку в байтовом виде
 
 
@@ -57,37 +60,42 @@ def search_two_in_file(file):
         # ввод даных
         display_as_table(file)
         print('Введите данные для первого поля:')
-        field = input(
-            colored('Введите название поля, в котором производится поиск: ', 'green'))
-        search_value = input(colored('Введите искомое значение: ', 'green'))
-        print('Введите данные для второго поля:')
-        field_1 = input(
-            colored('Введите название поля, в котором производится поиск: ', 'green'))
-        search_value_1 = input(colored('Введите искомое значение: ', 'green'))
-        os.system('cls')
-        tprint('Work With Database')
-        display_as_table(file)
-        print()
-
-        with open(file, 'br') as file:
-            headers = uncode(file.readline()).strip()
+        
+        with open(file, 'rb') as f:
+            headers = uncode(f.readline()).strip()
             delimeter = find_delimeter(headers)  # разделитель
-            # разбиваем заголовок по разделителю
             headers = headers.split(delimeter)
-
+            
+            # вывод меню для выбора поля
+            for i, header in enumerate(headers):
+                print(f'{i + 1} - {header}')
+                
+            field_index = int(input(colored('Введите номер поля, в котором производится поиск: ', 'green'))) - 1
+            search_value = input(colored('Введите искомое значение: ', 'green'))
+            
+            print('Введите данные для второго поля:')
+            for i, header in enumerate(headers):
+                print(f'{i + 1} - {header}')
+                
+            field_index_1 = int(input(colored('Введите номер поля, в котором производится поиск: ', 'green'))) - 1
+            search_value_1 = input(colored('Введите искомое значение: ', 'green'))
+            
+            os.system('cls')
+            tprint('Work With Database')
+            display_as_table(file)
+            print()
+            
             # проверка, что поиск возможен
-            if field not in headers or field_1 not in headers:
-                raise Exception(
-                    'Указанное значение поля не входит в заголовок')
-
-            print(colored(
-                f'Результаты поиска по полю {field} со значением {search_value}:', 'blue'))
-
+            if field_index >= len(headers) or field_index_1 >= len(headers):
+                raise Exception('Указанное значение поля не входит в заголовок')
+            
+            print(colored(f'Результаты поиска по полю {headers[field_index]} со значением {search_value} и по полю {headers[field_index_1]} со значением {search_value_1}:', 'blue'))
+            
             # поиск совпадений
-            for line in file:
+            for line in f:
                 line = uncode(line)
                 row = line.strip().split(delimeter)
-                if row[headers.index(field)].lower() == search_value.lower() and row[headers.index(field_1)].lower() == search_value_1.lower():
+                if row[field_index].lower() == search_value.lower() and row[field_index_1].lower() == search_value_1.lower():
                     print(colored(row, 'blue'))
     except FileNotFoundError:
         os.system("cls")
@@ -98,7 +106,7 @@ def search_two_in_file(file):
         tprint('Work With Database')
         print(colored(f'Произошла ошибка: {e}', 'green', 'on_blue'))
 
-# функция реализующая поиск по двум полям
+# функция реализующая поиск по одному полю
 
 
 def search_in_file(file):
@@ -106,34 +114,36 @@ def search_in_file(file):
         # проверка, что файл задан
         f = open(file)
         f.close()
-        # ввод даных
+        # ввод данных
         display_as_table(file)
-        field = input(
-            colored('Введите название поля, в котором производится поиск: ', 'green'))
-        search_value = input(colored('Введите искомое значение: ', 'green'))
-        os.system('cls')
-        tprint('Work With Database')
-        display_as_table(file)
-        print()
-
-        with open(file, 'rb') as file:
-            headers = uncode(file.readline()).strip()
+        with open(file, 'rb') as f:
+            headers = uncode(f.readline()).strip()
             delimeter = find_delimeter(headers)  # разделитель
-            # разбиваем заголовок по разделителю
             headers = headers.split(delimeter)
-
+            
+            # вывод меню для выбора поля
+            for i, header in enumerate(headers):
+                print(f'{i + 1} - {header}')
+                
+            field_index = int(input(colored('Введите номер поля, в котором производится поиск: ', 'green'))) - 1
+            search_value = input(colored('Введите искомое значение: ', 'green'))
+            
+            os.system('cls')
+            tprint('Work With Database')
+            display_as_table(file)
+            print()
+            
             # проверка, что поиск возможен
-            if field not in headers:
-                raise Exception(
-                    'Указанное значение поля не входит в заголовок')
-
-            print(colored(
-                f'Результаты поиска по полю {field} со значением {search_value}:', 'blue'))
-
-            for line in file:
+            if field_index >= len(headers):
+                raise Exception('Указанное значение поля не входит в заголовок')
+            
+            print(colored(f'Результаты поиска по полю {headers[field_index]} со значением {search_value}:', 'blue'))
+            
+            # поиск совпадений
+            for line in f:
                 line = uncode(line)
                 row = line.strip().split(delimeter)
-                if row[headers.index(field)].lower() == search_value.lower():
+                if row[field_index].lower() == search_value.lower():
                     print(colored(row, 'blue'))
     except FileNotFoundError:
         os.system("cls")
@@ -182,32 +192,68 @@ def append_to_file(file):
 
         display_as_table(file)
 
-        print(colored('Введите данные, которые надо занести в конец базы данных (Для выхода используете ctrl+Z, а затем enter): ', 'green'))
+        print(colored('Введите данные, которые надо занести в базу данных (Для выхода используете ctrl+Z, а затем enter): ', 'green'))
         for line in stdin:
             data.append(line)
 
-        with open(file, 'br') as file1:
+        with open(file, 'rb') as file1:
             headers = uncode(file1.readline()).strip()
             delimeter = find_delimeter(headers)
             length = len(headers.split(delimeter))
+            existing_data = file1.readlines()
+
         if delimeter == 0:
             raise Exception('В заголовке нет разделителя')
 
         for line in data:
             if delimeter not in line or length != len(line.split(delimeter)):
-                raise Exception(
-                    'Новые строки не подходят для выбранной базы данных')
-        with open(file, 'ab') as file:
-            for line in data:
-                file.write(code(line))
+                raise Exception('Новые строки не подходят для выбранной базы данных')
+
+        # проверка на тип
+        def get_data_type(value):
+            try:
+                int(value)
+                return int
+            except ValueError:
+                try:
+                    float(value)
+                    return float
+                except ValueError:
+                    return str
+
+        with open(file, 'rb') as file1:
+            file1.readline()  # Skip headers
+            for line in file1:
+                row = uncode(line).strip().split(delimeter)
+                for i, value in enumerate(row):
+                    if get_data_type(value) != get_data_type(data[0].strip().split(delimeter)[i]):
+                        raise Exception('Тип данных в новых строках не совпадает с существующими данными')
+
+        insert_position = input(colored('Введите номер строки, куда занести данные (0 для добавления в конец): ', 'green'))
+        insert_position = int(insert_position)
+
+        if insert_position < 0 or insert_position > len(existing_data):
+            raise Exception('Некорректный номер строки')
+
+        with open(file, 'wb') as file:
+            file.write(code(headers + '\n'))
+            if insert_position == 0:
+                file.writelines(existing_data)
+                for line in data:
+                    file.write(code(line))
+            else:
+                file.writelines(existing_data[:insert_position])
+                for line in data:
+                    file.write(code(line))
+                file.writelines(existing_data[insert_position:])
+
         os.system('cls')
         tprint('Work With Database')
         print(colored(f'Данные успешно добавлены в файл', 'green', 'on_blue'))
     except Exception as e:
         os.system('cls')
         tprint('Work With Database')
-        print(
-            colored(f'Произошла ошибка при добавлении данных: {e}', 'green', 'on_blue'))
+        print(colored(f'Произошла ошибка при добавлении данных: {e}', 'green', 'on_blue'))
 
 # функция задает рабочий файл
 
@@ -236,12 +282,12 @@ def choose_file(file):
 
 def work_with_database(file):
     errors = ['Неправильно введен путь до нового файла',
-              'Разделитель не задан', 'Ошибка в данных']
+              'Разделитель не задан', 'Ошибка в данных', 'Тип данных в столбцах не совпадает']
     start_file = file
 
     try:
         f = open(file)
-        f.close
+        f.close()
     except:
         name = input((colored('Введите абсолютный путь для файла: ', 'green'))).replace(
             '\\', '/').strip('"')
@@ -267,6 +313,28 @@ def work_with_database(file):
                 return start_file, errors[1]
         if delimeter not in line or length != len(line.split(delimeter)):
             return start_file, errors[2]
+
+    # Проверка типов данных в столбцах
+    def get_data_type(value):
+        try:
+            int(value)
+            return int
+        except ValueError:
+            try:
+                float(value)
+                return float
+            except ValueError:
+                return str
+
+    column_types = None
+    for line in data[1:]:
+        row = line.strip().split(delimeter)
+        if column_types is None:
+            column_types = [get_data_type(value) for value in row]
+        else:
+            for i, value in enumerate(row):
+                if get_data_type(value) != column_types[i]:
+                    return start_file, errors[3]
 
     with open(file, "wb") as file1:
         for line in data:
@@ -308,7 +376,7 @@ def main():
     1 - выбрать файл для работы.
     2 - инициализировать базу данных.
     3 - вывести содержимое базы данных
-    4 - добавить запись в конец базы данных
+    4 - добавить запись в базу данных
     5 - произвести поиск по одному полю
     6 - произвести поиск по двум полям
     Введите end для выхода из программы'''
